@@ -157,53 +157,9 @@ class TcpSocketConnection {
     }
     _connected = true;
     _printData("Socket successfully connected");
-    List<String> commandList = [];
+
     _server.listen((List<int> event) async {
-      Uint8List uint8list = Uint8List.fromList(event);
-
-      int input = uint8list[86];
-
-      int onReady = 128;
-      int onStart = 64;
-      int onBurning = 32;
-      int inWork = 16;
-      int onStop = 8;
-      int onTanking = 4;
-      int onTankFull = 2;
-      int onErrorCI = 1;
-
-      if (input & onReady == onReady) {
-        commandList.insert(0, 'Ready');
-      }
-      if (input & onStart == onStart) {
-        commandList.insert(0, 'Start');
-      }
-
-      if (input & onBurning == onBurning) {
-        commandList.insert(0, 'Burning');
-      }
-
-      if (input & inWork == inWork) {
-        commandList.insert(0, 'inWork');
-      }
-
-      if (input & onStop == onStop) {
-        commandList.insert(0, 'Stop');
-      }
-
-      if (input & onTanking == onTanking) {
-        commandList.insert(0, 'Tanking');
-      }
-
-      if (input & onTankFull == onTankFull) {
-        commandList.insert(0, 'Tank Full');
-      }
-
-      if (input & onErrorCI == onErrorCI) {
-        commandList.insert(0, 'Error CPU Internal');
-      }
-
-      callback(commandList);
+      callback(event);
     });
   }
 

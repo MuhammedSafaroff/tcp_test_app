@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:tcp_test_app/tcp_socket_connection.dart';
 
@@ -56,15 +58,19 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController ipAddress = TextEditingController();
   TextEditingController port = TextEditingController();
   TextEditingController data = TextEditingController();
+  TextEditingController indexCtrl = TextEditingController();
   TcpSocketConnection socketConnection;
   bool isConnect = false;
   final _key = GlobalKey<FormState>();
+  int inputIndex = 86;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(isConnect ? 'CONNECTED' : 'NO CONNECTED'),
+        title:
+            Text(isConnect ? 'CONNECTED - index: $inputIndex' : 'NO CONNECTED'),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
@@ -102,6 +108,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              decoration: InputDecoration(hintText: 'index'),
+              controller: indexCtrl,
+            ),
+            RaisedButton(
+              child: Text('Change index'),
+              onPressed: () {
+                inputIndex = int.parse(indexCtrl.text);
+                setState(() {});
+              },
             ),
             SizedBox(height: 20),
             TextField(
@@ -152,9 +170,53 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void messageReceived(List<String> msg) {
+  void messageReceived(List<int> event) {
+    List<String> commandList = [];
+    Uint8List uint8list = Uint8List.fromList(event);
+
+    int input = uint8list[inputIndex];
+
+    int onReady = 128;
+    int onStart = 64;
+    int onBurning = 32;
+    int inWork = 16;
+    int onStop = 8;
+    int onTanking = 4;
+    int onTankFull = 2;
+    int onErrorCI = 1;
+
+    if (input & onReady == onReady) {
+      commandList.insert(0, 'Ready');
+    }
+    if (input & onStart == onStart) {
+      commandList.insert(0, 'Start');
+    }
+
+    if (input & onBurning == onBurning) {
+      commandList.insert(0, 'Burning');
+    }
+
+    if (input & inWork == inWork) {
+      commandList.insert(0, 'inWork');
+    }
+
+    if (input & onStop == onStop) {
+      commandList.insert(0, 'Stop');
+    }
+
+    if (input & onTanking == onTanking) {
+      commandList.insert(0, 'Tanking');
+    }
+
+    if (input & onTankFull == onTankFull) {
+      commandList.insert(0, 'Tank Full');
+    }
+
+    if (input & onErrorCI == onErrorCI) {
+      commandList.insert(0, 'Error CPU Internal');
+    }
     setState(() {
-      listData = msg;
+      listData = commandList;
     });
   }
 
