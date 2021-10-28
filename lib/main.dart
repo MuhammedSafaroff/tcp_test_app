@@ -114,12 +114,24 @@ class _MyHomePageState extends State<MyHomePage> {
               decoration: InputDecoration(hintText: 'index'),
               controller: indexCtrl,
             ),
-            RaisedButton(
-              child: Text('Change index'),
-              onPressed: () {
-                inputIndex = int.parse(indexCtrl.text);
-                setState(() {});
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RaisedButton(
+                  child: Text('Change index'),
+                  onPressed: () {
+                    inputIndex = int.parse(indexCtrl.text);
+                    setState(() {});
+                  },
+                ),
+                RaisedButton(
+                  child: Text('Clear'),
+                  onPressed: () {
+                    listData.clear();
+                    setState(() {});
+                  },
+                ),
+              ],
             ),
             SizedBox(height: 20),
             TextField(
@@ -186,34 +198,34 @@ class _MyHomePageState extends State<MyHomePage> {
     int onErrorCI = 1;
 
     if (input & onReady == onReady) {
-      commandList.insert(0, 'Ready');
+      commandList.insert(0, 'Ready - $inputIndex');
     }
     if (input & onStart == onStart) {
-      commandList.insert(0, 'Start');
+      commandList.insert(0, 'Start - $inputIndex');
     }
 
     if (input & onBurning == onBurning) {
-      commandList.insert(0, 'Burning');
+      commandList.insert(0, 'Burning - $inputIndex');
     }
 
     if (input & inWork == inWork) {
-      commandList.insert(0, 'inWork');
+      commandList.insert(0, 'inWork - $inputIndex');
     }
 
     if (input & onStop == onStop) {
-      commandList.insert(0, 'Stop');
+      commandList.insert(0, 'Stop - $inputIndex');
     }
 
     if (input & onTanking == onTanking) {
-      commandList.insert(0, 'Tanking');
+      commandList.insert(0, 'Tanking - $inputIndex');
     }
 
     if (input & onTankFull == onTankFull) {
-      commandList.insert(0, 'Tank Full');
+      commandList.insert(0, 'Tank Full - $inputIndex');
     }
 
     if (input & onErrorCI == onErrorCI) {
-      commandList.insert(0, 'Error CPU Internal');
+      commandList.insert(0, 'Error CPU Internal - $inputIndex');
     }
     setState(() {
       listData = commandList;
