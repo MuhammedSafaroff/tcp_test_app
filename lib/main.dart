@@ -14,19 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -36,16 +24,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -53,8 +31,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // Socket socket;
-  List<String> listData = [];
+  List<String> stateCPU = [];
+  List<String> internalError = [];
+  List<String> curDI = [];
+  List<String> curDO = [];
   TextEditingController ipAddress = TextEditingController();
   TextEditingController port = TextEditingController();
   TextEditingController data = TextEditingController();
@@ -62,18 +42,46 @@ class _MyHomePageState extends State<MyHomePage> {
   TcpSocketConnection socketConnection;
   bool isConnect = false;
   final _key = GlobalKey<FormState>();
-  int inputIndex = 86;
+  int inputIndex = 0;
+  String blockStatus = 'Blokdadı';
+  Color blockColor = Colors.red;
+  bool sound = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title:
-            Text(isConnect ? 'CONNECTED - index: $inputIndex' : 'NO CONNECTED'),
+        title: Text(
+          isConnect
+              ? 'CONNECTED index: $inputIndex status: $blockStatus'
+              : 'NO CONNECTED',
+          style: TextStyle(fontSize: 14),
+        ),
+        backgroundColor: isConnect ? blockColor : Colors.teal,
+        actions: isConnect
+            ? [
+                if (sound)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Icon(
+                      Icons.volume_up,
+                      size: 30,
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Icon(
+                      Icons.volume_off,
+                      size: 30,
+                    ),
+                  )
+              ]
+            : [],
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1),
         child: Column(
           children: <Widget>[
             Form(
@@ -109,16 +117,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
             TextField(
-              decoration: InputDecoration(hintText: 'index'),
+              decoration: InputDecoration(hintText: 'Əlavə olunan index'),
               controller: indexCtrl,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 RaisedButton(
-                  child: Text('Change index'),
+                  child: Text('Change'),
                   onPressed: () {
                     inputIndex = int.parse(indexCtrl.text);
                     setState(() {});
@@ -127,38 +134,95 @@ class _MyHomePageState extends State<MyHomePage> {
                 RaisedButton(
                   child: Text('Clear'),
                   onPressed: () {
-                    listData.clear();
+                    stateCPU.clear();
+                    internalError.clear();
+                    curDI.clear();
+                    curDO.clear();
                     setState(() {});
                   },
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(hintText: 'Data'),
-              controller: data,
-            ),
-            RaisedButton(
-              child: Text('Send Data'),
-              onPressed: () {
-                sendData();
-              },
-            ),
-            SizedBox(height: 30),
+            // TextField(
+            //   decoration: InputDecoration(hintText: 'Data'),
+            //   controller: data,
+            // ),
+            // RaisedButton(
+            //   child: Text('Send Data'),
+            //   onPressed: () {
+            //     sendData();
+            //   },
+            // ),
+            Text('state CPU'),
             Expanded(
+              flex: 2,
               child: ListView.builder(
                 itemBuilder: (context, index) {
                   return Container(
                     height: 30,
                     width: double.infinity,
                     child: Text(
-                      listData[index],
-                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      stateCPU[index],
+                      style: TextStyle(color: Colors.indigo, fontSize: 18),
                       textAlign: TextAlign.center,
                     ),
                   );
                 },
-                itemCount: listData.length,
+                itemCount: stateCPU.length,
+              ),
+            ),
+            Text('Internal Error'),
+            Expanded(
+              flex: 2,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return Container(
+                    height: 30,
+                    width: double.infinity,
+                    child: Text(
+                      internalError[index],
+                      style: TextStyle(color: Colors.redAccent, fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                },
+                itemCount: internalError.length,
+              ),
+            ),
+            Text('Cur DI'),
+            Expanded(
+              flex: 2,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return Container(
+                    height: 30,
+                    width: double.infinity,
+                    child: Text(
+                      curDI[index],
+                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                },
+                itemCount: curDI.length,
+              ),
+            ),
+            Text('Cur DO'),
+            Expanded(
+              flex: 1,
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return Container(
+                    height: 30,
+                    width: double.infinity,
+                    child: Text(
+                      curDO[index],
+                      style: TextStyle(color: Colors.teal, fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  );
+                },
+                itemCount: curDO.length,
               ),
             ),
           ],
@@ -183,53 +247,151 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void messageReceived(List<int> event) {
-    List<String> commandList = [];
     Uint8List uint8list = Uint8List.fromList(event);
+    Uint16List uint16list = Uint16List.fromList(event);
 
-    int input = uint8list[inputIndex];
+    ByteBuffer buffer8 = uint8list.buffer;
+    ByteBuffer buffer16 = uint16list.buffer;
 
-    int onReady = 128;
-    int onStart = 64;
-    int onBurning = 32;
-    int inWork = 16;
-    int onStop = 8;
-    int onTanking = 4;
-    int onTankFull = 2;
-    int onErrorCI = 1;
+    ByteData data8 = new ByteData.view(buffer8);
+    ByteData data16 = new ByteData.view(buffer16);
+    int inputStateCPU = data8.getInt8(87 + inputIndex);
+    int inputStateBlock = data8.getInt8(156 + inputIndex);
+    int inputAudio = data8.getInt8(157 + inputIndex);
+    int inputCurDI = data8.getInt8(88 + inputIndex);
+    int inputCurDO = data8.getInt8(89 + inputIndex);
+    int inputInternalError = data16.getInt16(146 + inputIndex, Endian.little);
 
-    if (input & onReady == onReady) {
-      commandList.insert(0, 'Ready - $inputIndex');
+    //state cpu
+    int onReady = 1;
+    int onStart = 2;
+    int onBurning = 4;
+    int inWork = 8;
+    int onStop = 16;
+    int onTanking = 32;
+    int onTankFull = 64;
+    int onErrorCI = 128;
+    //curDI
+    int lowLevelFuelTank = 1;
+    int lowHightFuelTank = 2;
+    int lowAlertFuelTank = 4;
+    int fuelLeakage = 8;
+    int fillingHatchOpen = 16;
+    //stateBlock
+    int openBlock = 0;
+    //stateAudio
+    int mute = 0;
+    //curDO
+    int tankOpenKey = 1;
+    //InternalError
+    int fleshMemory = 1;
+    int tankTSF = 2;
+    int evaporatorTSF = 4;
+    int noseTSF = 8;
+    int frontPanelTSF = 16;
+
+    //block start
+    if (inputStateBlock == openBlock) {
+      blockColor = Colors.green;
+      blockStatus = 'Blokdan Çıxarıldı';
+    } else {
+      blockStatus = 'Blokdadı';
+      blockColor = Colors.red;
     }
-    if (input & onStart == onStart) {
-      commandList.insert(0, 'Start - $inputIndex');
+    setState(() {});
+    //block end
+
+    //mute start
+    if (inputAudio == mute) {
+      sound = false;
+    } else {
+      sound = true;
+    }
+    setState(() {});
+    //mute end
+
+    //state Cpu start
+    if (inputStateCPU & onReady == onReady) {
+      stateCPU.insert(0, 'Ready - $inputIndex');
+    }
+    if (inputStateCPU & onStart == onStart) {
+      stateCPU.insert(0, 'Start - $inputIndex');
     }
 
-    if (input & onBurning == onBurning) {
-      commandList.insert(0, 'Burning - $inputIndex');
+    if (inputStateCPU & onBurning == onBurning) {
+      stateCPU.insert(0, 'Burning - $inputIndex');
     }
 
-    if (input & inWork == inWork) {
-      commandList.insert(0, 'inWork - $inputIndex');
+    if (inputStateCPU & inWork == inWork) {
+      stateCPU.insert(0, 'inWork - $inputIndex');
     }
 
-    if (input & onStop == onStop) {
-      commandList.insert(0, 'Stop - $inputIndex');
+    if (inputStateCPU & onStop == onStop) {
+      stateCPU.insert(0, 'Stop - $inputIndex');
     }
 
-    if (input & onTanking == onTanking) {
-      commandList.insert(0, 'Tanking - $inputIndex');
+    if (inputStateCPU & onTanking == onTanking) {
+      stateCPU.insert(0, 'Tanking - $inputIndex');
     }
 
-    if (input & onTankFull == onTankFull) {
-      commandList.insert(0, 'Tank Full - $inputIndex');
+    if (inputStateCPU & onTankFull == onTankFull) {
+      stateCPU.insert(0, 'Tank Full - $inputIndex');
     }
 
-    if (input & onErrorCI == onErrorCI) {
-      commandList.insert(0, 'Error CPU Internal - $inputIndex');
+    if (inputStateCPU & onErrorCI == onErrorCI) {
+      //internal error start
+      if (inputInternalError & fleshMemory == fleshMemory) {
+        internalError.insert(0, 'Flash yaddaş mövcud deyil - $inputIndex');
+      }
+      if (inputInternalError & tankTSF == tankTSF) {
+        internalError.insert(
+            0, 'Tank temperatur sensörünün nasazlığı - $inputIndex');
+      }
+      if (inputInternalError & evaporatorTSF == evaporatorTSF) {
+        internalError.insert(
+            0, 'Buxarlayıcı temperatur sensörünün nasazlığı - $inputIndex');
+      }
+      if (inputInternalError & noseTSF == noseTSF) {
+        internalError.insert(
+            0, 'Burun temperatur sensörünün nasazlığı - $inputIndex');
+      }
+      if (inputInternalError & frontPanelTSF == frontPanelTSF) {
+        internalError.insert(
+            0, 'Ön panelin temperatur sensorunun nasazlığı - $inputIndex');
+      }
+      setState(() {});
+      //internal error end
     }
-    setState(() {
-      listData = commandList;
-    });
+    setState(() {});
+    //state Cpu end
+
+    //curDI start
+    if (inputCurDI & lowLevelFuelTank == lowLevelFuelTank) {
+      curDI.insert(0, 'çəndəki yanacağın aşağı səviyyəsi (L) - $inputIndex');
+    }
+    if (inputCurDI & lowHightFuelTank == lowHightFuelTank) {
+      curDI.insert(0, 'çəndəki yanacağın yuxarı səviyyəsi (H) - $inputIndex');
+    }
+    if (inputCurDI & lowAlertFuelTank == lowAlertFuelTank) {
+      curDI.insert(0, 'tankdakı təcili yanacaq səviyyəsi (H +) - $inputIndex');
+    }
+    if (inputCurDI & fuelLeakage == fuelLeakage) {
+      curDI.insert(0, 'yanacaq sızması - $inputIndex');
+    }
+    if (inputCurDI & fillingHatchOpen == fillingHatchOpen) {
+      curDI.insert(0, 'doldurma lyuku açıqdır - $inputIndex');
+    }
+    setState(() {});
+    //curDi end
+    curDO.clear();
+    setState(() {});
+    //curDO start
+    if (inputCurDO & tankOpenKey == tankOpenKey) {
+      curDO.insert(0, 'doldurma lyukunun kilidi açılıq - $inputIndex');
+      setState(() {});
+    }
+
+    //curDO end
   }
 
   void sendData() {
