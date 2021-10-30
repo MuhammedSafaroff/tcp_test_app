@@ -4,13 +4,11 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
-import 'dart:typed_data';
-
 class TcpSocketConnection {
-  String _ipAddress;
-  int _portAddress;
-  Socket _server;
-  String _eos;
+  String? _ipAddress;
+  int? _portAddress;
+  Socket? _server;
+  String? _eos;
   String _separator = "";
   bool _connected = false;
   bool _logPrintEnabled = false;
@@ -59,7 +57,7 @@ class TcpSocketConnection {
     int k = 1;
     while (k <= attempts) {
       try {
-        _server = await Socket.connect(_ipAddress, _portAddress,
+        _server = await Socket.connect(_ipAddress, _portAddress!,
             timeout: new Duration(milliseconds: timeOut));
         break;
       } catch (Exception) {
@@ -74,7 +72,7 @@ class TcpSocketConnection {
     _connected = true;
     _printData("Socket successfully connected");
     String message = "";
-    _server.listen((List<int> event) async {
+    _server!.listen((List<int> event) async {
       message += (utf8.decode(event));
       if (message.contains(eos)) {
         List<String> commands = message.split(_separator);
@@ -103,7 +101,7 @@ class TcpSocketConnection {
     int k = 1;
     while (k <= attempts) {
       try {
-        _server = await Socket.connect(_ipAddress, _portAddress,
+        _server = await Socket.connect(_ipAddress, _portAddress!,
             timeout: new Duration(milliseconds: timeOut));
         break;
       } catch (Exception) {
@@ -118,7 +116,7 @@ class TcpSocketConnection {
     _connected = true;
     _printData("Socket successfully connected");
     String message = "";
-    _server.listen((List<int> event) async {
+    _server!.listen((List<int> event) async {
       String received = (utf8.decode(event));
       message += received;
       _printData("Message received: " + message);
@@ -143,7 +141,7 @@ class TcpSocketConnection {
     int k = 1;
     while (k <= attempts) {
       try {
-        _server = await Socket.connect(_ipAddress, _portAddress,
+        _server = await Socket.connect(_ipAddress, _portAddress!,
             timeout: new Duration(milliseconds: timeOut));
         break;
       } catch (Exception) {
@@ -158,7 +156,7 @@ class TcpSocketConnection {
     _connected = true;
     _printData("Socket successfully connected");
 
-    _server.listen((List<int> event) async {
+    _server!.listen((List<int> event) async {
       callback(event);
     });
   }
@@ -167,7 +165,7 @@ class TcpSocketConnection {
   void disconnect() {
     if (_server != null) {
       try {
-        _server.close();
+        _server!.close();
         _printData("Socket disconnected successfully");
       } catch (Exception) {
         print("ERROR");
@@ -186,7 +184,7 @@ class TcpSocketConnection {
   ///  * @param  message  message to send to server
   void sendMessage(String message) async {
     if (_server != null) {
-      _server.add(utf8.encode(message));
+      _server!.add(utf8.encode(message));
 
       _printData("Message sent: " + message);
     } else {
@@ -201,14 +199,14 @@ class TcpSocketConnection {
   ///  * @param  command  tells the server what to do with the message
   void sendMessageWithCommand(String message, String command) async {
     if (_server != null) {
-      _server
-          .add(utf8.encode(command + _separator + message + _separator + _eos));
+      _server!.add(
+          utf8.encode(command + _separator + message + _separator + _eos!));
       _printData("Message sent: " +
           command +
           _separator +
           message +
           _separator +
-          _eos);
+          _eos!);
     } else {
       print(
           "Socket not initialized before sending message! Make sure you have alreadt called the method 'connect()'");
@@ -227,7 +225,7 @@ class TcpSocketConnection {
     int k = 1;
     while (k <= attempts) {
       try {
-        _server = await Socket.connect(_ipAddress, _portAddress,
+        _server = await Socket.connect(_ipAddress, _portAddress!,
             timeout: new Duration(milliseconds: timeOut));
         this.disconnect();
         return true;
