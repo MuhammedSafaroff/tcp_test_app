@@ -149,9 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ByteData data8 = new ByteData.view(buffer8);
                         data8.setInt8(0, 126);
                         data8.setInt8(1, 8);
-                        data8.setInt8(2, 12);
-                        data8.setInt8(162, 161);
-                        data8.setInt8(163, 150);
+                        data8.setInt8(2, 5);
+                        data8.setInt8(162, 148);
+                        data8.setInt8(163, 10);
 
                         Uint8List uint8Send = data8.buffer.asUint8List();
                         List<int> sendMessage = uint8Send.toList();
@@ -173,9 +173,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ByteData data8 = new ByteData.view(buffer8);
                         data8.setInt8(0, 126);
                         data8.setInt8(1, 8);
-                        data8.setInt8(2, 5);
-                        data8.setInt8(162, 148);
-                        data8.setInt8(163, 10);
+                        data8.setInt8(2, 12);
+                        data8.setInt8(162, 161);
+                        data8.setInt8(163, 150);
 
                         Uint8List uint8Send = data8.buffer.asUint8List();
                         List<int> sendMessage = uint8Send.toList();
@@ -560,7 +560,8 @@ class _MyHomePageState extends State<MyHomePage> {
     //curDO start
     if (inputCurDO & tankOpenKey == tankOpenKey) {
       curDO = 'doldurma lyukunun kilidi açıq';
-    } else {
+    }
+    if (inputCurDO == 0) {
       curDO = 'doldurma lyukunun kilidi bağlı';
     }
     setState(() {});
