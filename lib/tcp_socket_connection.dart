@@ -182,11 +182,11 @@ class TcpSocketConnection {
   /// Send message to server. Make sure to have established a connection before calling this method
   /// Message will be sent as 'message'+'separator'+'eos'
   ///  * @param  message  message to send to server
-  void sendMessage(String message) async {
+  void sendMessage(List<int> message) async {
     if (_server != null) {
-      _server!.add(utf8.encode(message));
+      _server!.add(message);
 
-      _printData("Message sent: " + message);
+      _printData("Message sent: $message");
     } else {
       print(
           "Socket not initialized before sending message! Make sure you have already called the method 'connect()'");
